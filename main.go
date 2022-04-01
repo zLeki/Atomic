@@ -53,13 +53,17 @@ func main() {
 
 	input := bufio.NewScanner(os.Stdin)
 	input.Scan()
-	if input.Text() == "2" {
-		data := GetMembers()
+	data := GetMembers()
+	if len(data.Data) == 0 {
+		fmt.Println("No members found")
+		return
+	}
+	switch input.Text() {
+	case "2":
 		for {
 			Blacklist(data)
 		}
-	} else if input.Text() == "1" {
-		data := GetMembers()
+	case "1":
 		for {
 			RankToRank(data)
 		}
