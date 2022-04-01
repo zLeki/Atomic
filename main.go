@@ -99,7 +99,7 @@ func RankToRank(data Users) {
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
 
-	if err := tea.NewProgram(m).Start(); err != nil {
+	if err := tea.NewProgram(&m).Start(); err != nil {
 		fmt.Println("Oh no!", err)
 		os.Exit(1)
 	}
@@ -202,7 +202,7 @@ func Blacklist(users Users) {
 		progress: progress.New(progress.WithDefaultGradient()),
 	}
 
-	if err := tea.NewProgram(m).Start(); err != nil {
+	if err := tea.NewProgram(&m).Start(); err != nil {
 		fmt.Println("Oh no!", err)
 		os.Exit(1)
 	}
