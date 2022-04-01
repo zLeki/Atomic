@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -21,20 +22,74 @@ import (
 var (
 	client  http.Client
 	cookie  = "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_37AE515F52936BC28BDF90DFDED741CA1584CD1FACFEF115E2CF892B48FEFC86BE66FEC686B52BAA086E6E0DDB66F7CD2DB9C6B3DC070725FCD50A552A0ED9B99E88E20A823DBD352A75A7AE5C3EE1FFDF077A2FF4CB3C2C95D4960A814FECCCA4F12E9FE41B77B0E351D3716F7B19710E9DD52D0BFF0934E10D1FDC841470284A8247C71E89D88C44002886DD5254B113E25670588B720867B2C27BBE671477DD635B9679944D0F75CB652E709144634F3B9E8840A110495104658796DF5CACD6D86DC3425637A94981A737A01B431379A591FE6BF4AC8E9B6C774F2AA42E6975BE203E0E13B96C21F32C104F912ABD088D946E6E55A131520F0EC5DE076D52E848916C0E08DC7FD956B592BB5D1A88CF6458AC2678B748EEFB2A9908B6DA73E32CC6CF058502D2B774714168B376E931BAAB075A20C14FC42B9FD8AB9119D93DE93377"
-	groupID = "8216474"
-	From    = "Member"
-	To      = "Trainee"
+	groupID = "7811440"
+	From    = "devils"
+	To      = "estupidos"
 )
 
 const CookieRequired = 4
 
+func Menu() {
+	fmt.Println(`
+            ,ggg,                                                          
+           dP""8I     I8                                                   
+          dP   88     I8                                                   
+         dP    88  88888888                                  gg            
+        ,8'    88     I8                                     ""            
+        d88888888     I8      ,ggggg,     ,ggg,,ggg,,ggg,    gg     ,gggg, 
+  __   ,8"     88     I8     dP"  "Y8ggg ,8" "8P" "8P" "8,   88    dP"  "Yb
+ dP"  ,8P      Y8    ,I8,   i8'    ,8I   I8   8I   8I   8I   88   i8'      
+ Yb,_,dP       '8b, ,d88b, ,d8,   ,d8'  ,dP   8I   8I   Yb,_,88,_,d8,_    _
+ "Y8P"         'Y888P""Y88P"Y8888P"    8P'   8I   8I   'Y88P""Y8P""Y8888PP`)
+
+	fmt.Println(`
+	Please choose an option. This program is still in development.
+	1. Rank to rank
+	2. Blacklist`)
+
+}
 func main() {
-	data := GetMembers()
-	for {
-		Blacklist(data)
+	Menu()
+
+	input := bufio.NewScanner(os.Stdin)
+	input.Scan()
+	if input.Text() == "2" {
+		data := GetMembers()
+		for {
+			Blacklist(data)
+		}
+	} else if input.Text() == "1" {
+		data := GetMembers()
+		for {
+			RankToRank(data)
+		}
 	}
 }
+func RankToRank(data Users) {
+	go func() {
+		for i, v := range data.Data {
+			for _, b := range SortRoles().Roles {
+				if b.Name == To {
+					dataBytes := []byte(`{"roleId":"` + strconv.Itoa(b.ID) + `"}`)
+					req := FormatRequest(http.MethodPatch, "https://groups.roblox.com/v1/groups/"+groupID+"/users/"+strconv.Itoa(v.UserID), CookieRequired, dataBytes)
+					if req != nil {
+						currentPercent = float64(i+1) / 100
+					}
+				}
+			}
 
+		}
+	}()
+
+	m := model{
+		progress: progress.New(progress.WithDefaultGradient()),
+	}
+
+	if err := tea.NewProgram(m).Start(); err != nil {
+		fmt.Println("Oh no!", err)
+		os.Exit(1)
+	}
+}
 func SortRoles() DataTree {
 	request := FormatRequest(http.MethodGet, "https://groups.roblox.com/v1/groups/"+groupID+"/roles", 0, nil)
 	var data DataTree
@@ -76,6 +131,8 @@ func FormatRequest(Method, URL string, conf byte, json []byte) *http.Response {
 		return nil
 	}
 	if do.StatusCode != http.StatusOK {
+		//dataBytes, _ := ioutil.ReadAll(do.Body)
+		//fmt.Println(string(dataBytes))
 		return nil
 	}
 	return do
