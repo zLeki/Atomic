@@ -110,7 +110,7 @@ func SortRoles() DataTree {
 	if request != nil {
 		err := json.NewDecoder(request.Body).Decode(&data)
 		if err != nil {
-			log.Fatalf("error decoding response", err)
+			log.Fatalf("error decoding response %d", err)
 		}
 	}
 	return data
@@ -127,7 +127,7 @@ func GetMembers() Users {
 		var data Users
 		err := json.NewDecoder(request.Body).Decode(&data)
 		if err != nil {
-			log.Fatalf("error decoding response", err)
+			log.Fatalf("error decoding response %d", err)
 		}
 		return data
 	} else {
