@@ -13,7 +13,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"strconv"
 	"strings"
 	"time"
@@ -21,10 +20,10 @@ import (
 
 var (
 	client  http.Client
-	cookie  = "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_71D211D7C582E54D5FC155F1022E2994480731256020508D7D63CE8CE99EAA5218066633A0AC0008A847C4194EB65C8F6F465283168AE71286F8F4CE98289B559170B0D3FCCD5FCEBFAD0532C54257F63B417BE823E045C023D647399D45D8A6EA41F60ACBA31780E688C77306CD8D8A69B8880C9AEF25782FB70C393BF90D21CC1BACE2F2C3DE63015C15A809A436ECCDCE5D8F85CF321D7CFAC5906F9D641EA5A28C9705F169CBA37D28A0DB8B22D3493E329A11CB8AF5397749091562B910FF9A1E3FE9ACDD517F0CB1EABB67AD8E93856E18DEB282D2D56BE168B5D4CB9287E45983711F2829EB68A14D6477F51E6EA652A89479AC41E5541AA54630501E3C1095C660021CB74F1C88236D2915DF88B27016BEE4A5A5C41DC984895A286850E77BF393764C77F030DEB6EB741F15ECDF1E4342BF78519336B1A29B3A4D3CE91E147A"
-	groupID = "8256997"
-	From    = "Admin"
-	To      = "Admin"
+	cookie  = ""
+	groupID = ""
+	From    = ""
+	To      = ""
 )
 
 const CookieRequired = 4
@@ -109,7 +108,10 @@ func SortRoles() DataTree {
 	request := FormatRequest(http.MethodGet, "https://groups.roblox.com/v1/groups/"+groupID+"/roles", 0, nil)
 	var data DataTree
 	if request != nil {
-		Decode(&data, request)
+		err := json.NewDecoder(request.Body).Decode(&data)
+		if err != nil {
+			log.Fatalf("error decoding response", err)
+		}
 	}
 	return data
 }
@@ -123,7 +125,10 @@ func GetMembers() Users {
 	request := FormatRequest(http.MethodGet, "https://groups.roblox.com/v1/groups/"+groupID+"/roles/"+strconv.Itoa(ROLEID)+"/users?sortOrder=Asc&limit=100&_=1646002139490", 0, nil)
 	if request != nil {
 		var data Users
-		Decode(&data, request)
+		err := json.NewDecoder(request.Body).Decode(&data)
+		if err != nil {
+			log.Fatalf("error decoding response", err)
+		}
 		return data
 	} else {
 		log.Fatalf("Failed to get members")
@@ -151,13 +156,6 @@ func FormatRequest(Method, URL string, conf byte, json []byte) *http.Response {
 		return nil
 	}
 	return do
-}
-func Decode[T any](t T, body *http.Response) T {
-	err := json.NewDecoder(body.Body).Decode(&t)
-	if err != nil {
-		log.Fatalf("error decoding response", err)
-	}
-	return t
 }
 
 type Users struct {
