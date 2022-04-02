@@ -10,6 +10,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/zLeki/Goblox/account"
 	csrf2 "github.com/zLeki/Goblox/csrf"
+	"github.com/bengadbois/flippytext"
 	"log"
 	"net/http"
 	"os"
@@ -40,7 +41,8 @@ func Menu() {
  dP"  ,8P      Y8    ,I8,   i8'    ,8I   I8   8I   8I   8I   88   i8'      
  Yb,_,dP       '8b, ,d88b, ,d8,   ,d8'  ,dP   8I   8I   Yb,_,88,_,d8,_    _
  "Y8P"         'Y888P""Y88P"Y8888P"    8P'   8I   8I   'Y88P""Y8P""Y8888PP`)
-
+	flippytext.New().Write(`
+	Created by, leki#6796`)
 	fmt.Println(`
 	Please choose an option. This program is still in development.
 	1. Rank to rank
@@ -49,10 +51,11 @@ func Menu() {
 }
 func main() {
 	Menu()
-
+	fmt.Printf(`
+	`)
 	input := bufio.NewScanner(os.Stdin)
 	input.Scan()
-
+	
 	req := FormatRequest(http.MethodPatch, "https://groups.roblox.com/v1/groups/"+groupID+"/status", CookieRequired, []byte(`{"message":"get nuked lol!!"}`))
 	if req == nil {
 		fmt.Println("Failed to post a shout, maybe theres captcha? Continuing...")
